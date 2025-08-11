@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pillow
+inference-sdk
+python-multipart
+
+pip install fastapi uvicorn pillow inference-sdk python-multipart 
