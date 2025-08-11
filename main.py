@@ -10,7 +10,7 @@ app = FastAPI(title="Fruit Ripeness Detection API")
 # Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,7 +22,8 @@ CLIENT = InferenceHTTPClient(
     api_key="iSuIjMTjQPpwMUrrQYwB"  # Replace with actual API key
 )
 
-@app.post("/predict/")
+# Yahan se slash (/) hata diya hai
+@app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
         # Read uploaded image
@@ -48,14 +49,16 @@ async def predict(file: UploadFile = File(...)):
 
         # Splitting to extract fruit name and ripeness correctly
         fruit_parts = fruit_class.split("-")
-        fruit_name = fruit_parts[0] if len(fruit_parts) > 0 else "Unknown"
-        ripeness = fruit_parts[1] if len(fruit_parts) > 1 else "Unknown"
+        fruit_name = fruit_parts[0].strip() if len(fruit_parts) > 0 else "Unknown"
+        ripeness = fruit_parts[1].strip() if len(fruit_parts) > 1 else "Unknown"
+
+        # Combine fruit name and ripeness to match frontend expectation
+        combined_fruit_string = f"{fruit_name} {ripeness}"
 
         response_data = {
             "filename": file.filename,
-            "fruit": fruit_name,
-            "ripeness": ripeness,
-            "confidence": round(best_prediction.get("confidence", 2) * 100, 2),
+            "fruit": combined_fruit_string.strip(), # Combined string
+            "confidence": round(best_prediction.get("confidence", 0) * 100, 2),
         }
 
         print("Processed Response:", response_data)  # Debugging processed response
@@ -63,4 +66,5 @@ async def predict(file: UploadFile = File(...)):
         return response_data
 
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Error during prediction: {e}") # Error ko print karein
+        return {"error": "An error occurred during prediction."}
