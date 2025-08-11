@@ -7,6 +7,7 @@ const fruitRoutes = require("./routes/fruit.route");
 const authRoutes = require("./routes/auth.route");
 
 const app = express();
+// Mongo db Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(express.json())
